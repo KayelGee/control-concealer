@@ -1,0 +1,10 @@
+{
+	"CONTROLCONCEALER.error.EditActive": "Can't switch between production and development while editing!",
+	"CONTROLCONCEALER.error.ControlMissmatch": "Control concealer - Your controls don't match the saved controls. Some controls couldn't be found look at the console for more information! Start edit mode and end it to save and to suppress this message!",
+	"CONTROLCONCEALER.warning.ControlMissmatchFixed": "Control concealer - Your controls don't match the saved controls, but I was able to find everything! Start edit mode and end it to save and to suppress this message!",
+	"CONTROLCONCEALER.info.EditModeActive": "Edit mode activated. Right click Controls/Tools to hide. To save press the edit mode button again.",
+	"CONTROLCONCEALER.info.EditModeEnd": "Edit mode deactivated. All changes have been saved.",
+	"CONTROLCONCEALER.button.dev": "Develop tab",
+	"CONTROLCONCEALER.button.prod": "Production tab",
+	"CONTROLCONCEALER.button.edit": "Toggle edit mode"
+}
