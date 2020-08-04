@@ -268,6 +268,6 @@
 		}
 	}
 
-	Hooks.on('canvasReady', () => ControlConcealer.initialize());
+	Hooks.once('canvasReady', () => ControlConcealer.initialize());
 	Hooks.on('renderSceneControls', (control, html, data) => ControlConcealer._renderSceneControls(control, html, data));
 })();
