@@ -21,7 +21,7 @@ might have a lot of tools they use while preparing games but a lot less or diffe
 ## Usage
 
 Above the layer controls are 3 buttons. One is the development tab, another the production tab. You can switch between these two
-by clicking on the button. To edit which tools are hidden in the current tab click the edit button. Then select all tools you want
+by clicking on the button. To edit which tools(or sidebar tabs) are hidden in the current tab click the edit button. Then select all tools(or sidebar tabs) you want
 hidden by right-clicking it. Then to save your selection press the edit button again.
 
 ![](control-concealer.gif)
