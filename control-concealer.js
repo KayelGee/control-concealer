@@ -1,70 +1,84 @@
 (async () => {
 	//CONFIG.debug.hooks=true;
 	class ControlConcealer {
-		static async initialize(){
+		constructor() {
+			this.view = "prod";
+			this.edit = false;
+		}
 
+		let
+		async initialize(){
+			this.loadHiddenElements();
+		}
+
+		async add_controls(html){
 			const myVar = 'Example value to be passed to handlebars';
 			const path = '/modules/control-concealer/templates';
 			// Get the handlebars output
 			const myHtml = await renderTemplate(`${path}/controlConcealerUI.html`, {myVar});
 
-			document.getElementById("controls").insertAdjacentHTML('beforebegin', myHtml);
+			html.prepend(myHtml);
 
-			let config_button=document.getElementById("control-concealer").getElementsByClassName("control-concealer-config")[0];
-			let dev_button=document.getElementById("control-concealer").getElementsByClassName("control-concealer-dev")[0];
-			let prod_button=document.getElementById("control-concealer").getElementsByClassName("control-concealer-prod")[0];
+			
+			let config_button=html.find("#control-concealer .control-concealer-config");
+			let dev_button=html.find("#control-concealer .control-concealer-dev");
+			let prod_button=html.find("#control-concealer .control-concealer-prod");
 
-			$(config_button).click(()=>{ControlConcealer.changeEditMode()});
-			$(dev_button).click(()=>{ 
-				if(config_button.classList.contains('active')) return ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.EditActive"));
-				prod_button.classList.toggle("active", false);
-				dev_button.classList.toggle("active", true);
+			config_button.click(()=>{this.changeEditMode()});
+			dev_button.click(()=>{ 
+				if(this.edit) return ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.EditActive"));
+				this.view = "dev";
 				//SceneControlsHider.loadHiddenStatus();
 				$(document).find(".scene-control.active").click();
 			});
-			$(prod_button).click(()=>{
-				if(config_button.classList.contains('active')) return ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.EditActive"));
-				prod_button.classList.toggle("active", true);
-				dev_button.classList.toggle("active", false);
+			prod_button.click(()=>{
+				if(config_button.hasClass('active')) return ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.EditActive"));
+				this.view = "prod";
 				//SceneControlsHider.loadHiddenStatus();
 				$(document).find(".scene-control.active").click();
 			});
 
-			if(!dev_button.classList.contains('active') && !prod_button.classList.contains('active')){
-				prod_button.classList.toggle('active', true);
+			if(this.view === "dev"){
+				dev_button.toggleClass('active', true);
 			}
-
-			ControlConcealer.loadHiddenElements();
+			else{
+				prod_button.toggleClass('active', true);
+			}
+			if(this.edit){
+				config_button.toggleClass('active', true);
+			}
 		}
 
-		static changeEditMode(){
+		changeEditMode(){
 			let config_button=document.getElementById("control-concealer").getElementsByClassName("control-concealer-config")[0];
 			if(config_button.classList.contains('active')){
+				this.edit=false;
 				config_button.classList.toggle('active', false);
-				ControlConcealer.endEditMode();
+				this.endEditMode();
 				
 				ui.notifications.info(game.i18n.localize("CONTROLCONCEALER.info.EditModeEnd"));
 			}else{
+				this.edit=true;
 				config_button.classList.toggle('active', true);
-				ControlConcealer.activateEditMode();
+				this.activateEditMode();
 				
 				ui.notifications.info(game.i18n.localize("CONTROLCONCEALER.info.EditModeActive"));
 			}
 		}
 
-		static activateEditMode(){
+		activateEditMode(){
 			document.getElementById("controls").classList.toggle('hide-active', false);
-			$('#controls').find('li').contextmenu(ControlConcealer.hideElement);
+			$('#controls').find('li').contextmenu(this.hideElement);
 		} 
 
-		static endEditMode(){
-			ControlConcealer.saveHiddenElements();
+		endEditMode(){
+			this.saveHiddenElements();
 
 			document.getElementById("controls").classList.toggle('hide-active', true);
-			$('#controls').find('li').off('contextmenu', ControlConcealer.hideElement);
+			$('#controls').find('li').off('contextmenu', this.hideElement);
 		}
 
-		static saveHiddenElements(){
+		saveHiddenElements(){
 			let hiddencontrols = [];
 			let hiddentools = [];
 			let scenecontrols = document.getElementById("controls").getElementsByClassName("scene-control");
@@ -119,18 +133,19 @@
 			game.user.setFlag('control-concealer', savetab, {hiddencontrols:hiddencontrols, hiddentools:hiddentools});
 		}
 
-		static _renderSceneControls(control, html, data){
-			ControlConcealer.loadHiddenElements();
+		async _renderSceneControls(control, html, data){
+			await this.add_controls(html);
+			this.loadHiddenElements();
 
 			if(!document.getElementById('control-concealer')) return;
 
 			let config_button=document.getElementById('control-concealer').getElementsByClassName("control-concealer-config")[0];
 			if(config_button.classList.contains('active')){
-				ControlConcealer.activateEditMode();
+				this.activateEditMode();
 			}
 		}
 
-		static loadHiddenElements(){
+		loadHiddenElements(){
 			let savetab = "prod-tab";
 			if(document.getElementById('control-concealer')){
 				let dev_button=document.getElementById("control-concealer").getElementsByClassName("control-concealer-dev")[0];
@@ -161,9 +176,9 @@
 
 				const getSceneControl = (ctrl, scenecontrols, index) => {
 					if(Object.keys(ctrl).length > 0){
-						if(!ControlConcealer.compareControl(ctrl, index)) {
+						if(!this.compareControl(ctrl, index)) {
 							hasControlMissmatch = true;
-							const actualIndex = ControlConcealer.findControl(ctrl);
+							const actualIndex = this.findControl(ctrl);
 							if(actualIndex == -1) {
 								console.log("Control concealer | couldn't find: ", ctrl);
 								hasUnfixedControlMissmatch = true;
@@ -178,9 +193,9 @@
 				}
 				const getControlTool = (tool, scenetools, ctrl_index, tool_index) => {
 					if(Object.keys(tool).length > 0){
-						if(!ControlConcealer.compareTool(tool, ctrl_index, tool_index)){
+						if(!this.compareTool(tool, ctrl_index, tool_index)){
 							hasControlMissmatch = true;
-							const actualIndex = ControlConcealer.findTool(tool, ctrl_index);
+							const actualIndex = this.findTool(tool, ctrl_index);
 							if(actualIndex == -1) {
 								console.log("Control concealer | couldn't find: ", tool);
 								hasUnfixedControlMissmatch = true;
@@ -220,15 +235,15 @@
 			document.getElementById("controls").classList.toggle('hide-active', true);
 		}
 
-		static findControl(target){
+		findControl(target){
 			return ui.controls.controls.findIndex(control => control.icon === target.icon && control.name === target.name && control.title === target.title);
 		}
 
-		static findTool(target, ctrl_index){
+		findTool(target, ctrl_index){
 			return ui.controls.controls[ctrl_index].tools.findIndex(tool => tool.icon === target.icon && tool.name === target.name && tool.title === target.title);
 		}
 
-		static compareControl(source, index){
+		compareControl(source, index){
 			if(ui.controls.controls.length <= index){
 				return false;
 			}
@@ -243,7 +258,7 @@
 			return true;
 		}
 
-		static compareTool(source, control_index, tool_index){
+		compareTool(source, control_index, tool_index){
 			if(ui.controls.controls.length <= control_index){
 				return false;
 			}
@@ -261,13 +276,14 @@
 			return true;
 		}
 
-		static hideElement(event){
 			event.currentTarget.classList.toggle("control-concealer-hide");
-			ControlConcealer.saveHiddenElements();
+		hideElement = (event) =>{
+			this.saveHiddenElements();
 			return false;
 		}
 	}
 
-	Hooks.once('canvasReady', () => ControlConcealer.initialize());
-	Hooks.on('renderSceneControls', (control, html, data) => ControlConcealer._renderSceneControls(control, html, data));
+	let controlConcealer = new ControlConcealer(); 
+	Hooks.once('canvasReady', () => controlConcealer.initialize());
+	Hooks.on('renderSceneControls', (control, html, data) => controlConcealer._renderSceneControls(control, html, data));
 })();
