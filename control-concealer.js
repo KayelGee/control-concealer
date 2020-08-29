@@ -68,20 +68,48 @@
 
 		activateEditMode(){
 			document.getElementById("controls").classList.toggle('hide-active', false);
+			document.getElementById("sidebar").classList.toggle('hide-active', false);
+			this.addSidebarOverlay();
 			$('#controls').find('li').contextmenu(this.hideElement);
 		} 
+
+		addSidebarOverlay(){
+			let overlayCol = $('<div class="item-overlay-col tabs"></div>');
+			$('#sidebar-tabs').append(overlayCol);
+			let add_overlay=(element) =>{
+				let overlay_item = $('<div>&nbsp;</div>');
+				overlay_item.addClass("item-overlay");
+				overlay_item.attr('data-original-tab', $(element).data('tab'));
+				overlayCol.append(overlay_item);
+				overlay_item.contextmenu(this.hideSidebarElement);
+			};
+			$('#sidebar-tabs').find(".item").each((index, element)=>{
+				add_overlay(element);
+			});
+			$('#sidebar-tabs').find(".collapse").each((index, element)=>{
+				add_overlay(element);
+			});
+		}
+
+		removeSidebarOverlay(){
+			$('#sidebar-tabs').find(".item-overlay-col").remove();
+		}
 
 		endEditMode(){
 			this.saveHiddenElements();
 
 			document.getElementById("controls").classList.toggle('hide-active', true);
+			document.getElementById("sidebar").classList.toggle('hide-active', true);
+			this.removeSidebarOverlay();
 			$('#controls').find('li').off('contextmenu', this.hideElement);
 		}
 
 		saveHiddenElements(){
 			let hiddencontrols = [];
 			let hiddentools = [];
+			let hiddentabs= [];
 			let scenecontrols = document.getElementById("controls").getElementsByClassName("scene-control");
+			let sidebartabs = document.getElementById("sidebar-tabs").getElementsByClassName("item");
 			for (let i = 0; i < scenecontrols.length; i++) {
 				const scenecontrol = scenecontrols[i];
 				let hiddenscenecontrol = (() => {
@@ -126,11 +154,60 @@
 					else hiddentools.push({});
 				}
 			}
+
+			for (let i = 0; i < sidebartabs.length; i++) {
+				const tab = sidebartabs[i];
+				if(tab.classList.contains("control-concealer-hide")){
+					hiddentabs.push(tab.dataset.tab);
+				}
+			}
+
 			let dev_button=document.getElementById("control-concealer").getElementsByClassName("control-concealer-dev")[0];
 			let savetab = "prod-tab";
 			if(dev_button.classList.contains("active")) savetab = "dev-tab";
 			
-			game.user.setFlag('control-concealer', savetab, {hiddencontrols:hiddencontrols, hiddentools:hiddentools});
+			game.user.setFlag('control-concealer', savetab, {hiddencontrols:hiddencontrols, hiddentools:hiddentools, hiddentabs:hiddentabs});
+		}
+
+		invert_element_color(element){
+			let bg=window.getComputedStyle(element, null).getPropertyValue('background-color');
+			let fg=window.getComputedStyle(element, null).getPropertyValue('color');
+			element.dataset.originalColor = fg;
+			element.dataset.originalBackgroundColor = bg;
+			element.style.color = this.invert_color(fg);
+			element.style.backgroundColor = this.invert_color(bg);
+		}
+
+		reset_element_color(element){
+			if(element.dataset.originalColor) element.style.color = element.dataset.originalColor; 
+			if(element.dataset.originalBackgroundColor) element.style.backgroundColor = element.dataset.originalBackgroundColor;
+		}
+
+		invert_color(color){
+			let newcolor = color;
+			if(color.startsWith("rgba")){
+				newcolor = "rgba(";
+				let colors = color.replace("rgba(", "");
+				colors = colors.replace(")", "");
+				colors = colors.split(", ");
+				for (let i = 0; i < colors.length-1; i++) {
+					colors[i] = (255 - parseInt(colors[i]));
+				}
+				newcolor += colors.join(", "); 
+				newcolor += ")";
+			}
+			else if(color.startsWith("rgb")){
+				newcolor = "rgb(";
+				let colors = color.replace("rgb(", "");
+				colors = colors.replace(")", "");
+				colors = colors.split(", ");
+				for (let i = 0; i < colors.length; i++) {
+					colors[i] = (255 - parseInt(colors[i]));
+				}
+				newcolor += colors.join(", "); 
+				newcolor += ")";			
+			}
+			return newcolor;
 		}
 
 		async _renderSceneControls(control, html, data){
@@ -152,20 +229,27 @@
 				if(dev_button.classList.contains("active")) savetab = "dev-tab";
 			}
 			let tab= game.user.getFlag('control-concealer', savetab) || {};
-			if(Object.keys(tab).length==0) return;
-
-			let hiddencontrols = tab.hiddencontrols;
-			let hiddentools = tab.hiddentools;
 
 			let scenecontrols = document.getElementById("controls").getElementsByClassName("scene-control");
 			//disable all hidden status
 			for (let i = 0; i < scenecontrols.length; i++) {
-				scenecontrols[i].classList.toggle("control-concealer-hide", false);;
+				this.toggle_hidden(scenecontrols[i], false);
 				const tools = scenecontrols[i].getElementsByClassName("control-tool");
 				for (let j = 0; j < tools.length; j++) {
-					tools[j].classList.toggle("control-concealer-hide", false);;;
+					this.toggle_hidden(tools[j], false);
 				}
 			}
+			let sidebartabs = document.getElementById("sidebar-tabs").getElementsByClassName("item");
+			for (let i = 0; i < sidebartabs.length; i++) {
+				this.toggle_hidden(sidebartabs[i], false);
+			}
+
+			
+			if(Object.keys(tab).length==0) return;
+
+			let hiddencontrols = tab.hiddencontrols;
+			let hiddentools = tab.hiddentools;
+			let hiddentabs = tab.hiddentabs;
 
 			let hasControlMissmatch = false;
 			let hasUnfixedControlMissmatch = false;
@@ -212,7 +296,7 @@
 				const [scenecontrol] = getSceneControl(hiddencontrol, scenecontrols, i);
 				const [scenecontroltools, actualIndex] = getSceneControl(hiddencontroltools, scenecontrols, i);
 				if(scenecontrol){
-					scenecontrol.classList.toggle("control-concealer-hide", true);
+					this.toggle_hidden(scenecontrol, true);
 				}
 				else if(scenecontroltools){
 					const scenetools = scenecontroltools.getElementsByClassName("control-tool");
@@ -220,11 +304,24 @@
 						const hiddentool = hiddencontroltools.tools[j];
 						const [scenetool] = getControlTool(hiddentool, scenetools, actualIndex, j);
 						if(scenetool){
-							scenetool.classList.toggle("control-concealer-hide", true);
+							this.toggle_hidden(scenetool, true);
 						}
 					}
 				}
 			}
+
+			const sidebartabs_arr = Array.from(sidebartabs)
+			for (let i = 0; i < hiddentabs.length; i++) {
+				const htab = sidebartabs_arr.find(element => element.dataset.tab === hiddentabs[i]);
+				if(htab){
+					this.toggle_hidden(htab, true);
+				}
+				else{
+					console.log("Control concealer | couldn't find sidebar tab: ", hiddentabs[i]);
+					hasUnfixedControlMissmatch = true;
+				}
+			}
+
 			if(hasControlMissmatch){
 				if(hasUnfixedControlMissmatch){
 					ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.ControlMissmatch"));
@@ -233,6 +330,7 @@
 				}
 			}
 			document.getElementById("controls").classList.toggle('hide-active', true);
+			document.getElementById("sidebar").classList.toggle('hide-active', true);
 		}
 
 		findControl(target){
@@ -276,13 +374,29 @@
 			return true;
 		}
 
-			event.currentTarget.classList.toggle("control-concealer-hide");
+		toggle_hidden(element, value){
+			if(value === undefined){
+				value = !element.classList.contains("control-concealer-hide");
+			}
+			element.classList.toggle("control-concealer-hide", value);
+			if(value === true) this.invert_element_color(element);
+			else this.reset_element_color(element);
+		}
+
 		hideElement = (event) =>{
+			this.toggle_hidden(event.currentTarget);
 			this.saveHiddenElements();
 			return false;
 		}
-	}
 
+		hideSidebarElement = (event) =>{
+			console.log("hide " + $(event.currentTarget).attr("data-original-tab"));
+			let target = $(event.currentTarget).parent().parent().find(".item[data-tab='" + $(event.currentTarget).attr("data-original-tab") + "']");
+			this.toggle_hidden(target[0]);
+			//this.saveHiddenElements();
+			return false;
+		}
+	}
 	let controlConcealer = new ControlConcealer(); 
 	Hooks.once('canvasReady', () => controlConcealer.initialize());
 	Hooks.on('renderSceneControls', (control, html, data) => controlConcealer._renderSceneControls(control, html, data));
