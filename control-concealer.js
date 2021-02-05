@@ -30,23 +30,29 @@
 				this.view = "dev";
 				//SceneControlsHider.loadHiddenStatus();
 				$(document).find(".scene-control.active").click();
+				this.updateButtons();
 			});
 			prod_button.click(()=>{
 				if(config_button.hasClass('active')) return ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.EditActive"));
 				this.view = "prod";
 				//SceneControlsHider.loadHiddenStatus();
 				$(document).find(".scene-control.active").click();
+				this.updateButtons();
 			});
 
-			if(this.view === "dev"){
-				dev_button.toggleClass('active', true);
-			}
-			else{
-				prod_button.toggleClass('active', true);
-			}
-			if(this.edit){
-				config_button.toggleClass('active', true);
-			}
+			this.updateButtons();
+		}
+
+		updateButtons(){
+			let config_button=$(document).find("#control-concealer .control-concealer-config");
+			let dev_button=$(document).find("#control-concealer .control-concealer-dev");
+			let prod_button=$(document).find("#control-concealer .control-concealer-prod");
+
+			dev_button.toggleClass('active', this.view === "dev");
+			prod_button.toggleClass('active', this.view === "prod");
+			config_button.toggleClass('active', this.edit);
+			
+			this.loadHiddenElements();
 		}
 
 		changeEditMode(){
