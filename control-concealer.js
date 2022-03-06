@@ -16,8 +16,8 @@
 			const path = '/modules/control-concealer/templates';
 			// Get the handlebars output
 			const myHtml = await renderTemplate(`${path}/controlConcealerUI.html`, {myVar});
-
-			html.prepend(myHtml);
+			const main_controls = html.find(".main-controls");
+			main_controls.prepend(myHtml);
 
 			
 			let config_button=html.find("#control-concealer .control-concealer-config");
@@ -381,6 +381,9 @@
 		}
 
 		toggle_hidden(element, value){
+			if(element.classList.contains("control-concealer-top")) return;
+			if(element.classList.contains("control-concealer-tab")) return;
+			if(element.id === "control-concealer") return;
 			if(value === undefined){
 				value = !element.classList.contains("control-concealer-hide");
 			}

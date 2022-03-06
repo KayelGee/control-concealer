@@ -4,19 +4,35 @@
 
 #control-concealer {
 	padding: 0;
-	margin: 0 0 8px 0;
+	margin: 0 0 0 4px;
 	list-style: none;
 	background: none;
 	box-shadow: none;
 	border: none;
 }
 
-.control-concealer-tab {
+.control-concealer-top {
 	width: 18px;
 	height: 18px;
 	box-sizing: content-box;
 	font-size: 12px;
 	line-height: 18px;
+	background: rgba(0, 0, 0, 0) !important;
+	box-shadow: 0 0 10px #000;
+	margin: 0 4px 0 0;
+	color: #BBB;
+	text-align: center;
+	border: 1px solid #000;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.control-concealer-tab {
+	width: 18px;
+	height: 16px;
+	box-sizing: content-box;
+	font-size: 12px;
+	line-height: 16px;
 	background: rgba(0, 0, 0, 0.5);
 	box-shadow: 0 0 10px #000;
 	margin: 0 4px 0 0;
