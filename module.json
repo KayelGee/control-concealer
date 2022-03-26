@@ -2,7 +2,7 @@
 	"name": "control-concealer",
 	"title": "Control concealer",
 	"description": "Adds two customizable tabs to the controls bar(on the left) and let's you hide tools(or complete layer controls) in each of those.Should you add or remove modules after you have made a selection this will try to adapt your previous selectiong to the added or deleted tools. This is for everyone that has a lot of modules that add their tools to the layer controls on the left side and also for everyone that might have a lot of tools they use while preparing games but a lot less or different while actually playing.",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"minimumCoreVersion": "9",
 	"compatibleCoreVersion": "9",
 	"author": "KayelGee - KayelGee#5241",
@@ -23,6 +23,6 @@
 	"socket": false,
 	"url": "https://github.com/KayelGee/control-concealer",
   "manifest": "https://raw.githubusercontent.com/KayelGee/control-concealer/master/module.json",
-  "download": "https://github.com/KayelGee/control-concealer/releases/download/v1.2.1/v1.2.1.zip",
-  "readme": "https://github.com/KayelGee/control-concealer/blob/v1.2.1/README.md"
+  "download": "https://github.com/KayelGee/control-concealer/releases/download/v1.2.2/v1.2.2.zip",
+  "readme": "https://github.com/KayelGee/control-concealer/blob/v1.2.2/README.md"
 }

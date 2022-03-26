@@ -28,14 +28,12 @@
 			dev_button.click(()=>{ 
 				if(this.edit) return ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.EditActive"));
 				this.view = "dev";
-				//SceneControlsHider.loadHiddenStatus();
 				$(document).find(".scene-control.active").click();
 				this.updateButtons();
 			});
 			prod_button.click(()=>{
 				if(config_button.hasClass('active')) return ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.EditActive"));
 				this.view = "prod";
-				//SceneControlsHider.loadHiddenStatus();
 				$(document).find(".scene-control.active").click();
 				this.updateButtons();
 			});
@@ -114,7 +112,10 @@
 			let hiddencontrols = [];
 			let hiddentools = [];
 			let hiddentabs= [];
+			
 			let scenecontrols = document.getElementById("controls").getElementsByClassName("scene-control");
+			let subcontrols = document.getElementById("controls").getElementsByClassName("sub-controls");
+
 			let sidebartabs = document.getElementById("sidebar-tabs").getElementsByClassName("item");
 			for (let i = 0; i < scenecontrols.length; i++) {
 				const scenecontrol = scenecontrols[i];
@@ -135,7 +136,7 @@
 				}
 				else{
 					hiddencontrols.push({});
-					const tools = scenecontrol.getElementsByClassName("control-tool");
+					const tools = subcontrols[i].getElementsByClassName("control-tool");
 					let toolshidden = false;
 					for (let j = 0; j < tools.length; j++) {
 						const tool = tools[j];
@@ -237,10 +238,11 @@
 			let tab= game.user.getFlag('control-concealer', savetab) || {};
 
 			let scenecontrols = document.getElementById("controls").getElementsByClassName("scene-control");
+			let subcontrols = document.getElementById("controls").getElementsByClassName("sub-controls");
 			//disable all hidden status
 			for (let i = 0; i < scenecontrols.length; i++) {
 				this.toggle_hidden(scenecontrols[i], false);
-				const tools = scenecontrols[i].getElementsByClassName("control-tool");
+				const tools = subcontrols[i].getElementsByClassName("control-tool");
 				for (let j = 0; j < tools.length; j++) {
 					this.toggle_hidden(tools[j], false);
 				}
@@ -305,7 +307,7 @@
 					this.toggle_hidden(scenecontrol, true);
 				}
 				else if(scenecontroltools){
-					const scenetools = scenecontroltools.getElementsByClassName("control-tool");
+					const scenetools = subcontrols[i].getElementsByClassName("control-tool");
 					for (let j = 0; j < hiddencontroltools.tools.length; j++) {
 						const hiddentool = hiddencontroltools.tools[j];
 						const [scenetool] = getControlTool(hiddentool, scenetools, actualIndex, j);
