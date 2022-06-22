@@ -6,9 +6,8 @@
 			this.edit = false;
 		}
 
-		let
 		async initialize(){
-			this.loadHiddenElements();
+			await this.loadHiddenElements();
 		}
 
 		async add_controls(html){
@@ -108,7 +107,7 @@
 			$('#controls').find('li').off('contextmenu', this.hideElement);
 		}
 
-		saveHiddenElements(){
+		async saveHiddenElements(){
 			let hiddencontrols = [];
 			let hiddentools = [];
 			let hiddentabs= [];
@@ -173,7 +172,7 @@
 			let savetab = "prod-tab";
 			if(dev_button.classList.contains("active")) savetab = "dev-tab";
 			
-			game.user.setFlag('control-concealer', savetab, {hiddencontrols:hiddencontrols, hiddentools:hiddentools, hiddentabs:hiddentabs});
+			await game.user.setFlag('control-concealer', savetab, {hiddencontrols:hiddencontrols, hiddentools:hiddentools, hiddentabs:hiddentabs});
 		}
 
 		invert_element_color(element){
@@ -219,7 +218,7 @@
 
 		async _renderSceneControls(control, html, data){
 			await this.add_controls(html);
-			this.loadHiddenElements();
+			await this.loadHiddenElements();
 
 			if(!document.getElementById('control-concealer')) return;
 
@@ -229,7 +228,7 @@
 			}
 		}
 
-		loadHiddenElements(){
+		async loadHiddenElements(){
 			let savetab = "prod-tab";
 			if(document.getElementById('control-concealer')){
 				let dev_button=document.getElementById("control-concealer").getElementsByClassName("control-concealer-dev")[0];
@@ -247,7 +246,7 @@
 					this.toggle_hidden(tools[j], false);
 				}
 			}
-			let sidebartabs = document.getElementById("sidebar-tabs").getElementsByClassName("item");
+			let sidebartabs = document.getElementById("sidebar-tabs")?.getElementsByClassName("item") ?? [];
 			for (let i = 0; i < sidebartabs.length; i++) {
 				this.toggle_hidden(sidebartabs[i], false);
 			}
@@ -335,6 +334,7 @@
 					ui.notifications.error(game.i18n.localize("CONTROLCONCEALER.error.ControlMissmatch"));
 				}else{
 					ui.notifications.warn(game.i18n.localize("CONTROLCONCEALER.warning.ControlMissmatchFixed"));
+					await this.saveHiddenElements();
 				}
 			}
 			document.getElementById("controls").classList.toggle('hide-active', true);

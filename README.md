@@ -3,7 +3,7 @@
 ![GitHub Releases](https://img.shields.io/github/downloads/KayelGee/control-concealer/latest/total?style=for-the-badge) 
 ![GitHub All Releases](https://img.shields.io/github/downloads/KayelGee/control-concealer/total?style=for-the-badge&label=Downloads+total)  
 
-**[Compatibility]**: *FoundryVTT* 0.6.0+  
+**[Compatibility]**: *FoundryVTT* 0.9.0+  
 **[Systems]**: *any*  
 **[Languages]**: *English*  
 
@@ -26,6 +26,12 @@ hidden by right-clicking it. Then to save your selection press the edit button a
 
 ![](control-concealer.gif)
 
+To copy control settings from one player to other players see the included macro "(CC)Copy Controls to Users", edit "copyUser" and "targetUsers" to match the names of your users.
+
 ## Contact
 
 If you wish to contact me for any reason, reach me out on Discord using my tag: `KayelGee#5241`
+
+## Credits
+
+Combat Carousel Fix provided by dhorkin
