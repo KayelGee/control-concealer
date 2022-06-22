@@ -136,7 +136,7 @@
 				}
 				else{
 					hiddencontrols.push({});
-					const tools = subcontrols[i].getElementsByClassName("control-tool");
+					const tools = subcontrols[i]?.getElementsByClassName("control-tool") ?? [];
 					let toolshidden = false;
 					for (let j = 0; j < tools.length; j++) {
 						const tool = tools[j];
@@ -242,7 +242,7 @@
 			//disable all hidden status
 			for (let i = 0; i < scenecontrols.length; i++) {
 				this.toggle_hidden(scenecontrols[i], false);
-				const tools = subcontrols[i].getElementsByClassName("control-tool");
+				const tools = subcontrols[i]?.getElementsByClassName("control-tool") ?? [];
 				for (let j = 0; j < tools.length; j++) {
 					this.toggle_hidden(tools[j], false);
 				}
